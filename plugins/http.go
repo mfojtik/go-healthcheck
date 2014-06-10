@@ -43,16 +43,22 @@ func (HttpPlugin) Check(req *api.StatusRequest, ch chan bool) {
 	resp, err := client.Get("http://" + req.Address + ":" + req.Port + "/")
 
 	if err != nil {
+		if req.Verbose {
+			log.Printf("HTTP Error: %s\n", err)
+		}
 		ch <- false
 		return
+	}
+
+	if req.Verbose {
+		log.Printf("HTTP Response: %s\n", resp.Status)
+	}
+
+	// FIXME: Support more HTTP status codes
+	//
+	if resp.Status == "200 OK" {
+		ch <- true
 	} else {
-		if req.Verbose {
-			log.Printf("HTTP Response: %s\n", resp.Status)
-		}
-		if resp.Status == "200 OK" {
-			ch <- true
-		} else {
-			ch <- false
-		}
+		ch <- false
 	}
 }
