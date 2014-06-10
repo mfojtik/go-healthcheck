@@ -1,6 +1,11 @@
 package api
 
-import "time"
+import (
+	"fmt"
+	"log"
+	"strings"
+	"time"
+)
 
 var Timeout = time.Duration(10 * time.Second)
 
@@ -20,7 +25,24 @@ type Repository struct {
 	plugins []Plugin
 }
 
-func (r *Repository) Register(p Plugin) {
+func ParsePlugins(s string, repo Repository) (plugins []*Plugin) {
+	if s == "" {
+		fmt.Printf("Please specify a list of plugins you want to use (-P)\n")
+		return
+	}
+	pluginNames := strings.Split(s, ",")
+	for i := 0; i < len(pluginNames); i++ {
+		if plugin := repo.FindByName(pluginNames[i]); plugin == nil {
+			log.Printf("The plugin '%s' is invalid\n", pluginNames[i])
+			continue
+		} else {
+			plugins = append(plugins, &plugin)
+		}
+	}
+	return plugins
+}
+
+func (r *Repository) Add(p Plugin) {
 	r.plugins = append(r.plugins, p)
 }
 

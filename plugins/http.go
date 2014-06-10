@@ -1,7 +1,7 @@
 package plugins
 
 import (
-	"fmt"
+	"log"
 	"net"
 	"net/http"
 
@@ -24,6 +24,10 @@ func (HttpPlugin) Usage() string {
 
 func (HttpPlugin) Check(req *api.StatusRequest, ch chan bool) {
 
+	if req.Port == "" {
+		req.Port = "8080"
+	}
+
 	transport := http.Transport{
 		Dial: dialTimeout,
 	}
@@ -32,16 +36,23 @@ func (HttpPlugin) Check(req *api.StatusRequest, ch chan bool) {
 		Transport: &transport,
 	}
 
-	resp, err := client.Get("http://" + req.Address + ":" + req.Port + "/")
-
 	if req.Verbose {
-		fmt.Println(resp.Status)
+		log.Println("GET " + "http://" + req.Address + ":" + req.Port + "/")
 	}
+
+	resp, err := client.Get("http://" + req.Address + ":" + req.Port + "/")
 
 	if err != nil {
 		ch <- false
 		return
 	} else {
-		ch <- true
+		if req.Verbose {
+			log.Printf("HTTP Response: %s\n", resp.Status)
+		}
+		if resp.Status == "200 OK" {
+			ch <- true
+		} else {
+			ch <- false
+		}
 	}
 }

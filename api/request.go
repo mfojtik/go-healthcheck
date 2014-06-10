@@ -1,31 +1,27 @@
 package api
 
 import (
-	"fmt"
 	"log"
-	"strings"
 
 	"github.com/fsouza/go-dockerclient"
 )
 
-type Request struct {
-	Address string
-	Verbose bool
-}
-
 type StatusRequest struct {
-	Container  *docker.Container
-	Plugins    []*Plugin
-	Verbose    bool
-	Address    string
-	Port       string
-	Args       []string
-	Socket     string
-	PluginList string
+	Container *docker.Container
+	Verbose   bool
+	Address   string
+	Port      string
+	Args      []string
+	Socket    string
+	Plugins   []*Plugin
 }
 
 func (s *StatusRequest) SetArgs(args []string) {
 	s.Args = args
+}
+
+func (s *StatusRequest) SetPlugins(plugins []*Plugin) {
+	s.Plugins = plugins
 }
 
 func (s *StatusRequest) FindContainer(containerId string) (err error) {
@@ -36,21 +32,6 @@ func (s *StatusRequest) FindContainer(containerId string) (err error) {
 	s.Container, err = client.InspectContainer(containerId)
 	s.Address = s.Container.NetworkSettings.IPAddress
 	return
-}
-
-func (s *StatusRequest) InitializePlugins(repo *Repository) {
-	pluginNames := strings.Split(s.PluginList, ",")
-	for i := 0; i < len(pluginNames); i++ {
-		if plugin := repo.FindByName(pluginNames[i]); plugin == nil {
-			fmt.Printf("The plugin '%s' is invalid\n", pluginNames[i])
-			continue
-		} else {
-			if s.Verbose {
-				log.Printf("Enabling %s plugin", pluginNames[i])
-			}
-			s.Plugins = append(s.Plugins, &plugin)
-		}
-	}
 }
 
 func (s *StatusRequest) Execute() bool {

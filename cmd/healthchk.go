@@ -10,18 +10,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var repo = api.Repository{}
-
-func registerPlugins() {
-	repo.Register(plugins.HttpPlugin{})
-	repo.Register(plugins.MongoPlugin{})
-	repo.Register(plugins.TcpPlugin{})
-}
-
 func main() {
 
+	var enabledPlugins string
+
+	repo := api.Repository{}
+
+	repo.Add(plugins.HttpPlugin{})
+	repo.Add(plugins.MongoPlugin{})
+	repo.Add(plugins.TcpPlugin{})
+
 	req := &api.StatusRequest{}
-	registerPlugins()
 
 	mainCmd := &cobra.Command{
 		Use:   "healthchk",
@@ -32,8 +31,7 @@ func main() {
 	}
 
 	mainCmd.PersistentFlags().BoolVar((&req.Verbose), "verbose", false, "Enable verbose output")
-	mainCmd.PersistentFlags().StringVarP((&req.Port), "port", "p", "", "Network port to health check")
-	mainCmd.PersistentFlags().StringVarP((&req.Socket), "socket", "", "unix:///var/run/docker.sock", "Docker socket to use")
+	mainCmd.PersistentFlags().StringVar((&req.Socket), "socket", "unix:///var/run/docker.sock", "Docker socket to use")
 
 	statusCmd := &cobra.Command{
 		Use:   "status CONTAINER_ID",
@@ -45,6 +43,8 @@ func main() {
 				return
 			}
 
+			req.SetPlugins(api.ParsePlugins(enabledPlugins, repo))
+
 			req.SetArgs(args)
 
 			if err := req.FindContainer(args[0]); err != nil {
@@ -52,18 +52,16 @@ func main() {
 				return
 			}
 
-			req.InitializePlugins(&repo)
-
 			ok := req.Execute()
 
 			if !ok {
 				if req.Verbose {
-					log.Printf("Container %s health check failed.", req.Container.ID)
+					log.Printf("Container %s health check FAILED", req.Container.ID)
 				}
 				os.Exit(1)
 			} else {
 				if req.Verbose {
-					log.Printf("Container %s health check succeeded.", req.Container.ID)
+					log.Printf("Container %s is OK", req.Container.ID)
 				}
 			}
 		},
@@ -80,7 +78,8 @@ func main() {
 		},
 	}
 
-	statusCmd.PersistentFlags().StringVarP((&req.PluginList), "plugins", "P", "", "A comma separated list of plugins to use")
+	statusCmd.PersistentFlags().StringVarP((&enabledPlugins), "plugins", "P", "", "A comma separated list of plugins to use")
+	statusCmd.PersistentFlags().StringVarP((&req.Port), "port", "p", "", "Network port to health check")
 
 	mainCmd.AddCommand(statusCmd)
 	mainCmd.AddCommand(listCmd)
