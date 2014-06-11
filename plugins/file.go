@@ -29,7 +29,7 @@ func (FilePlugin) Perform(req *api.StatusRequest, ch chan bool) {
 		filePath = req.Args[1]
 	}
 
-	cmd := []string{"/bin/ls", filePath}
+	cmd := []string{"/bin/sh", "-c", "[ -e " + filePath + " ]"}
 
 	containerNsPID, err := client.ChildProcessForContainer(req.Container)
 	exitCode, err := namespace.RunIn(req.Container.Name, containerNsPID, cmd, req.Container.Config.Env)
