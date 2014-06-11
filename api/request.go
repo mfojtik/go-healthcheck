@@ -31,6 +31,14 @@ func (s *StatusRequest) FindContainer(containerId string) (err error) {
 	}
 	s.Container, err = client.InspectContainer(containerId)
 	s.Address = s.Container.NetworkSettings.IPAddress
+	if s.Port == "" {
+		for key, _ := range s.Container.Config.ExposedPorts {
+			s.Port = key.Port()
+		}
+		if s.Verbose {
+			log.Printf("Using port exposed by container: %s\n", s.Port)
+		}
+	}
 	return
 }
 
