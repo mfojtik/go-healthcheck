@@ -23,7 +23,7 @@ func (FilePlugin) Perform(req *api.StatusRequest, ch chan bool) {
 		return
 	}
 
-	filePath := "/.ready"
+	filePath := "/tmp/.ready"
 
 	if len(req.Args) > 1 {
 		filePath = req.Args[1]
