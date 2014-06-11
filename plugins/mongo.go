@@ -14,11 +14,7 @@ func (MongoPlugin) Name() string {
 	return "mongo"
 }
 
-func (MongoPlugin) Usage() string {
-	return "Usage: TBD"
-}
-
-func (MongoPlugin) Check(req *api.StatusRequest, ch chan bool) {
+func (MongoPlugin) Perform(req *api.StatusRequest, ch chan bool) {
 	url := req.Address + ":" + req.Port
 
 	if req.Verbose {

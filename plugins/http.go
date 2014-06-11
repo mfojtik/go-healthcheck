@@ -18,11 +18,7 @@ func (HttpPlugin) Name() string {
 	return "http"
 }
 
-func (HttpPlugin) Usage() string {
-	return "Usage: TBD"
-}
-
-func (HttpPlugin) Check(req *api.StatusRequest, ch chan bool) {
+func (HttpPlugin) Perform(req *api.StatusRequest, ch chan bool) {
 
 	uri := "/"
 

@@ -45,7 +45,7 @@ func (s *StatusRequest) FindContainer(containerId string) (err error) {
 func (s *StatusRequest) Execute() bool {
 	healthChan := make(chan bool)
 	for i := 0; i < len(s.Plugins); i++ {
-		go (*s.Plugins[i]).Check(s, healthChan)
+		go (*s.Plugins[i]).Perform(s, healthChan)
 	}
 	for i := 0; i < len(s.Plugins); i++ {
 		ok := <-healthChan

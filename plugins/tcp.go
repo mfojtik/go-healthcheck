@@ -15,11 +15,7 @@ func (TcpPlugin) Name() string {
 	return "tcp"
 }
 
-func (TcpPlugin) Usage() string {
-	return "Usage: TBD"
-}
-
-func (TcpPlugin) Check(req *api.StatusRequest, ch chan bool) {
+func (TcpPlugin) Perform(req *api.StatusRequest, ch chan bool) {
 	if req.Verbose {
 		log.Println("Probing TCP port " + req.Address + ":" + req.Port)
 	}

@@ -17,8 +17,7 @@ type PluginRepository interface {
 
 type Plugin interface {
 	Name() string
-	Usage() string
-	Check(statusRequest *StatusRequest, ch chan bool)
+	Perform(statusRequest *StatusRequest, ch chan bool)
 }
 
 type Repository struct {
