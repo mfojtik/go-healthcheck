@@ -1,27 +1,38 @@
 go-healthcheck
 ------------------
 
-This tool can be used to health-check Docker container using the network
-connection or via inspecting the Docker container logs.
+This tool can be used to perform a health check operations against the Docker
+containers. It has support for plugins, thus it is easely extensible.
+
+There are three plugins atm.:
+
+* **http** - Perform a HTTP health check against container.
+* **mongo** - Perform a MongoDB connection test against container
+* **tcp** - Perform a generic TCP connection test
+
+The connection based plugins will guess the port from the container by default
+(from `EXPOSE`).
 
 ### Usage
 
 ```
-# See if the HTTP server is running on port 8080
 
-$ healthck status $CID -p 8080 -P http
-$ echo $? # -> 0
+# Check if the container respond to HTTP requests
+$ healthck status 3e3a1ebbb4dd -P http
 
-# Check if the MongoDB accepts connection on 27017
+# Check if the MongoDB container is ready for connections
+$ healthck status 3e3a1ebbb4dd -P mongo
 
-$ healthck status $CID -p 27017 -P mongo
-$ echo $? # -> 0
-
-# Generic TCP check if the port 9292 is open
-
-$ healthck status $CID -p 9292 -P tcp
-$ echo $? # -> 1
-
+# A generic TCP check
+$ healthck status 3e3a1ebbb4dd -P tcp
 ```
 
-The `$CID` variable represents the Docker container ID.
+### Extending
+
+To add a new plugin, all you have to do is to create a `struct` that implements
+two methods: `Name()` and `Perform()`. See the existing plugins for an example.
+
+
+### License
+
+Apache Software License (ASL) 2.0.
