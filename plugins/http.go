@@ -24,6 +24,12 @@ func (HttpPlugin) Usage() string {
 
 func (HttpPlugin) Check(req *api.StatusRequest, ch chan bool) {
 
+	uri := "/"
+
+	if len(req.Args) > 1 {
+		uri = req.Args[1]
+	}
+
 	if req.Port == "" {
 		req.Port = "8080"
 	}
@@ -37,10 +43,10 @@ func (HttpPlugin) Check(req *api.StatusRequest, ch chan bool) {
 	}
 
 	if req.Verbose {
-		log.Println("GET " + "http://" + req.Address + ":" + req.Port + "/")
+		log.Println("GET " + "http://" + req.Address + ":" + req.Port + uri)
 	}
 
-	resp, err := client.Get("http://" + req.Address + ":" + req.Port + "/")
+	resp, err := client.Get("http://" + req.Address + ":" + req.Port + uri)
 
 	if err != nil {
 		if req.Verbose {
