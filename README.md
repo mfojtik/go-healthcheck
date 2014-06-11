@@ -9,6 +9,7 @@ There are three plugins atm.:
 * **http** - Perform a HTTP health check against container.
 * **mongo** - Perform a MongoDB connection test against container
 * **tcp** - Perform a generic TCP connection test
+* **file** - Perform a check if the file exists in container
 
 The connection based plugins will guess the port from the container by default
 (from `EXPOSE`).
@@ -25,6 +26,9 @@ $ healthck status 3e3a1ebbb4dd -P mongo
 
 # A generic TCP check
 $ healthck status 3e3a1ebbb4dd -P tcp
+
+# A file check
+$ healthchk status 347cf00e6650 -P file /etc/hosts
 ```
 
 ### Extending
