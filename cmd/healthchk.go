@@ -19,6 +19,7 @@ func main() {
 	repo.Add(plugins.HttpPlugin{})
 	repo.Add(plugins.MongoPlugin{})
 	repo.Add(plugins.TcpPlugin{})
+	repo.Add(plugins.FilePlugin{})
 
 	req := &api.StatusRequest{}
 
