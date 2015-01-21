@@ -58,7 +58,7 @@ func (HttpPlugin) Perform(req *api.StatusRequest, ch chan bool) {
 
 	// FIXME: Support more HTTP status codes
 	//
-	if resp.Status == "200 OK" {
+	if resp.StatusCode != http.StatusOK {
 		ch <- true
 	} else {
 		ch <- false
